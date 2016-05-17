@@ -1,12 +1,10 @@
 """A hackable minesweeper game"""
 #MineSweeper
-
 from Tkinter import *
-import tkMessageBox
+from tkMessageBox import *
 from random import *
 import math
 frame = Tk()
-
 
 Label(frame, text="Enter the grid size n:").grid(row=0,column=0)
 e1=Entry(frame)
@@ -47,17 +45,11 @@ def mine_positions(n,m):
     for i in range(0,int(no_of_mines)):
         while True:
             k=randint(0,len(m)-1)
-
-
             z=m[k]
             if z not in pos:
                 pos.append(z)
                 break
     return pos
-
-
-
-
 #creating main grid
 def fetch_grid_size():
     grid_size = e1.get()
@@ -75,54 +67,75 @@ def fetch_grid_size():
     #list of positions that have mines
     mines_at_pos=mine_number(mine_pos,x.keys(),size_of_grid)
     #dictionary with position as key and number of neighbour mines as value
+    flag_pos=[]
     for i in mine_pos:
         mines_at_pos[tuple(i)]='*'
-    print mines_at_pos
-    def number(event):
+    
+    def left_number(event):
         for each in x:
             if str(event.widget)==str(x[each]):
                 c=each
 
         event.widget['text']=mines_at_pos[c]
-    def mine(event):
+        check()
+
+    def left_mine(event):
         event.widget["text"] = "X"
         event.widget["bg"] = "red"
         event.widget['state']='disabled'
         event.widget.config(relief=SUNKEN)
         for all in mines_at_pos:
             if mines_at_pos[all]=='*':
-                print 'running'
+
                 x[all]["text"] = "X"
                 x[all]["state"] = "disabled"
             else:
                 x[all]["text"]=mines_at_pos[all]
                 x[all]["state"] = "disabled"
-        pop_up=Tk()
-        label=Label(pop_up,text='You loser!')
-        label.pack()
+        showinfo('Lost','You Loser!')
+        check()
+    def right(event):
+        event.widget['text']='|>'
+        for h in x:
+            if str(event.widget)==str(x[h]):
+                flag_pos.append(h)
+        check()
+    def check():
+        #if all open except for mines
+        tex=[]
+        for all in x:
+            tex.append(x[all]['text'])
+        if tex.count('')== math.floor((size_of_grid**2)/4.0) and len(flag_pos)==0 :
+            showinfo('WIN','You Win!')
+
+        #if flags in correct position
+        mine_pos.sort()
+        flag_pos.sort()
+        count=0
+        if mine_pos==flag_pos :
+            for posi in mines_at_pos:
+                if mines_at_pos[posi]!='*' :
+                    if x[posi]['text']!='':
+                        count+=1
+            if count==(size_of_grid*size_of_grid)-math.floor((size_of_grid**2)/4.0):
+
+
+                showinfo('WIN','You Win!')
+
     for b1 in mines_at_pos:
         f=b1[0]
         g=b1[1]
         if mines_at_pos[b1]=='*':
-            print 'f,g',f,g
-            x[(f,g)].bind("<Button-1>",mine)
+
+            x[(f,g)].bind("<Button-1>",left_mine)
+            x[(f,g)].bind("<Button-3>",right)
         else:
-            x[(f,g)].bind("<Button-1>",number)
+            x[(f,g)].bind("<Button-1>",left_number)
+            x[(f,g)].bind("<Button-3>",right)
 
 
 Button(frame,text='ok',command=fetch_grid_size).grid(row=2,column=0,sticky=W,pady=4)
-
-
-
-
-
-
-
-
-
 #button1['state']='disabled' -------for disabling a button
-
-
 #main.minsize(height=600,width=400)
 
 
